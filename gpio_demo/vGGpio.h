@@ -39,6 +39,12 @@
 #include <tuple>
 #include <memory>
 #include <iostream>
+#ifndef _DEBUG
+#define _DO(args...)    do{printf(args);printf("\n");}while(0);
+#else
+#define _DO(args...)    
+#endif
+
 #if __cplusplus < 201703L
 #error "at least C++17"
 #endif
@@ -46,7 +52,7 @@
 #if __cplusplus >= 201703L
 #define _VG_CONSTEXPR17 constexpr
 #else
-#define _VG_CONSTEXPR17
+#define _VG_CONSTEXPR17 
 #endif
 
 #ifdef _VG_THROW
@@ -104,7 +110,7 @@ enum pi_maker{
 class basic_pin;
 class pwm_controllor;
 class pin;
-extern pin& get(basic_pin _pin);
+extern pin& get(pos_t _pin);
 namespace detail {
 using namespace vGGpio;
 _VG_CONSTEXPR17 int strcmpare(const char* _s1, const char* _s2) {
@@ -117,24 +123,24 @@ using __pin_struct = ::std::tuple<vGGpio::pos_t, vGGpio::pos_t, vGGpio::pos_t, c
 _VG_CONSTEXPR17 static __pin_struct __pin_data[41] = {
 	{1,  -1, -1, "3.3v"},	 {2,  -1, -1,  "5v"},
 	{3,  2,  8,  "sda.1"},	 {4,  -1, -1,  "5v"},
-	{5,  3,  9,  "scl.1"},	 {6,  -1, -1,  "gnd"},
+	{5,  3,  9,  "scl.1"},	 {6,  -1, -1,  "0v"},
 	{7,  4,  7,  "gpio.7"},	 {8,  14, 15,  "txd"},
-	{9,  -1, -1, "gnd"},	 {10, 15, 16,  "rxd"},
+	{9,  -1, -1, "0v"},	 {10, 15, 16,  "rxd"},
 	{11, 17, 0, "gpio.0"},	 {12, 18,  1,  "gpio.1"},
-	{13, 27, 2,  "gpio.2"},	 {14, -1, -1,  "gnd"},
+	{13, 27, 2,  "gpio.2"},	 {14, -1, -1,  "0v"},
 	{15, 22, 3,  "gpio.3"},	 {16, 23,  4,  "gpio.4"},
 	{17, -1, -1, "3.3v"},	 {18, 24,  5,  "gpio.5"},
-	{19, 10, 12, "mosi"},	 {20, -1, -1,  "gnd"},
+	{19, 10, 12, "mosi"},	 {20, -1, -1,  "0v"},
 	{21, 9,  13, "miso"},	 {22, 25,  6,  "gpio.6"},
 	{23, 11, 14, "sclk"},	 {24, 8,  10,  "ce0"},
-	{25, -1, -1, "gnd"},	 {26, 7,  11,  "ce1"},
+	{25, -1, -1, "0v"},	 {26, 7,  11,  "ce1"},
 	{27, 0,  30, "sda.0"},	 {28, 1,  31,  "scl.0"},
-	{29, 5,  21, "gpio.21"}, {30, -1, -1,  "gnd"},
+	{29, 5,  21, "gpio.21"}, {30, -1, -1,  "0v"},
 	{31, 6,  22, "gpio.22"}, {32, 12, 26,  "gpio.26"},
-	{33, 13, 23, "gpio.23"}, {34, -1, -1,  "gnd"},
+	{33, 13, 23, "gpio.23"}, {34, -1, -1,  "0v"},
 	{35, 19, 24, "gpio.24"}, {36, 16, 27,  "gpio.27"},
 	{37, 26, 25, "gpio.25"}, {38, 20, 28,  "gpio.28"},
-	{39, -1, -1, "gnd"},	 {40, 21, 29,  "gpio.29"},
+	{39, -1, -1, "0v"},	 {40, 21, 29,  "gpio.29"},
 	{_VGPIO_INVAILD_PIN,-1,-1,"error"}//用来标记错误
 };
 
@@ -152,27 +158,38 @@ _VG_CONSTEXPR17 bool _is_invaild_board_port(pos_t _st) {
 	return (_st < 1 || _st > 40);
 }
 _VG_CONSTEXPR17 bool _is_invaild_bcm_port(pos_t _st) {//28
-	return (_st < 0 || _st>27);
+	return (_st < 0 || _st > 27);
 }
 _VG_CONSTEXPR17 bool _is_invaild_wpi_port(pos_t _st) {
 	return (_st < 0 || (_st > 18 && _st < 21) || _st>31);
 }
-_VG_CONSTEXPR17 bool _is_gpio_port(pos_t _st) {
-	if (_is_invaild_board_port(_st)) {
-		if (vstring::traits_type::length(std::get<3>(__pin_data[_st])) > 5) {
-			return !vstring::traits_type::compare(std::get<3>(__pin_data[_st]), "gpio.", 5);
-		}
-	}
-	return false;
-}
+//是否为有效可控制的
 _VG_CONSTEXPR17 bool _is_invaild(const __pin_struct& _st) {
 	return _is_invaild_board_port(::std::get<0>(_st)) ||
-		_is_invaild_bcm_port(::std::get<1>(_st));
-	_is_invaild_wpi_port(::std::get<2>(_st));
+		_is_invaild_bcm_port(::std::get<1>(_st)) ||
+		_is_invaild_wpi_port(::std::get<2>(_st));
+}
+inline bool _is_gpio_port(pos_t _st) {
+
+	auto pin_data = [_st]() _VG_CONSTEXPR17{
+		int pos = 0;
+		for (pos_t i = 0; i != 40; ++i) {
+			if (::std::get<0>(__pin_data[i]) == _st) {
+				return __pin_data[i];
+			}
+		}
+		return __pin_data[pos];
+	}();
+	if (!_is_invaild(pin_data)) {
+		if (::std::get<2>(pin_data) != -1) {
+			return !vstring::traits_type::compare(::std::get<3>(pin_data), "gpio", 4);
+		}
+		return false;
+	}
+	return (!_is_invaild(pin_data)) && (vstring::traits_type::compare(::std::get<3>(pin_data), "gpio", 4));
 }
 void __vg_exception(const char* const _msg);
-}//detail
-
+}
 class exception {
 public:
 	_VG_CONSTEXPR17 exception(const char* const _const_des) :
@@ -213,7 +230,7 @@ public:
 	~basic_pin();
 	//返回bcm编码，不存在就返回-1
 	_VG_CONSTEXPR17 int get_bcm()const{
-		const auto& it = detail::_iter_pin_data([this](const __pin_struct& _pin) _VG_CONSTEXPR17{
+		const auto& it = detail::_iter_pin_data([this](const __pin_struct& _pin) /*_VG_CONSTEXPR17*/{
 		return (::std::get<0>(_pin) == this->pin_);
 			});
 		if (detail::_is_invaild(it)) {
@@ -223,7 +240,7 @@ public:
 	}
 	//返回wiringPi编码，不存在返回-1
 	_VG_CONSTEXPR17 int get_wiringPi()const {
-		const auto& it = detail::_iter_pin_data([this](const __pin_struct& _pin) _VG_CONSTEXPR17{
+		const auto& it = detail::_iter_pin_data([this](const __pin_struct& _pin) /*_VG_CONSTEXPR17*/{
 		return (::std::get<0>(_pin) == this->pin_);
 			});
 		if (detail::_is_invaild(it)) {
@@ -237,7 +254,7 @@ public:
 	}
 	//返回对应pin的名称
 	_VG_CONSTEXPR17 const char* get_name()const {
-		const auto& it = detail::_iter_pin_data([this](const __pin_struct& _pin) _VG_CONSTEXPR17{
+		const auto& it = detail::_iter_pin_data([this](const __pin_struct& _pin) /*_VG_CONSTEXPR17*/{
 		return (::std::get<0>(_pin) == this->pin_);
 			});
 		if (detail::_is_invaild(it)) {
@@ -251,7 +268,7 @@ public:
 	_VG_CONSTEXPR17 unsigned char statue() const {
 		return mark_ & 0x7;
 	}
-	_VG_CONSTEXPR17 bool is_gpio_port()const {
+	bool is_gpio_port()const {
 		return detail::_is_gpio_port(pin_);
 	}
 	//重新恢复原始状态(没有PWM,输出)
@@ -295,7 +312,7 @@ private:
 class pin {
 public:
 	pin() :data_(nullptr) {}
-	pin(basic_pin& _pin){
+	pin(pos_t _pin){
 		*this = get(_pin);
 	}
 	pin& operator=(pin&& _pin) noexcept {
@@ -315,7 +332,7 @@ public:
 	//设置工作状态
 	void statue(pin_mode _t);
 	pin_mode statue() const {
-		data_->statue();
+		return (pin_mode)data_->statue();
 	}
 	//写入
 	void write(pin_statue _t);

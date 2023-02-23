@@ -79,13 +79,13 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp" />
-    <ClCompile Include="vGGoip.cpp">
+    <ClCompile Include="vGGpio.cpp">
       <UnrollLoops Condition="'$(Configuration)|$(Platform)'=='Debug|ARM'">false</UnrollLoops>
       <UnrollLoops Condition="'$(Configuration)|$(Platform)'=='Release|ARM'">false</UnrollLoops>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="vGGoip.h" />
+    <ClInclude Include="vGGpio.h" />
   </ItemGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|ARM'">
     <ClCompile>

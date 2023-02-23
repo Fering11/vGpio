@@ -1,4 +1,4 @@
-﻿#include "vGGoip.h"
+﻿#include "vGGpio.h"
 //#include <wiringPi.h>
 #include <softPwm.h>
 
@@ -171,13 +171,14 @@ int main() {
 int main() {
 	namespace vg = vGGpio;
 	std::cout << "init statue:" << vg::setup() << std::endl;
-	auto& pin = vg::get(11);
+	auto pin = vg::get(11);
 #if 0
 	pin.statue(vg::OUTPUT);
 	pin.write(vg::HIGH);
 	vg::delay(2000);
 	pin.write(vg::LOW);
 #else
+	pin.statue(vg::SOFT_PWM_OUTPUT);
 	int bright = 0;
 	int range = 100;
 	pin.pwm_create(0, 100);

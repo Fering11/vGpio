@@ -1,4 +1,4 @@
-#include "vGGoip.h"
+#include "vGGpio.h"
 #include <exception>
 #include <stdexcept>
 #include <wiringPi.h>
@@ -10,11 +10,6 @@
 
 #ifdef _VG_THROW
 #undef _VG_THROW
-#endif
-#ifndef VGGOIP_NO_ALLOW_EXCEPTION
-#define _VG_THROW(ex_msg)  do {throw ::vGGpio::exception(ex_msg);}while(0)
-#else
-#define _VG_THROW
 #endif
 #define _VGPIO_INVAILD_PIN  41 //不存在或者错误的pin
 
@@ -41,17 +36,18 @@ void __vg_exception(const char* const _msg) {
 }
 
 //输入物理编码
-extern pin& get(basic_pin _pin) {
-	if (_pin.invaild()) {
+extern pin& get(pos_t _pin) {
+	if (detail::_is_invaild_board_port(_pin)) {
 		detail::__vg_exception("Pin is vaild");
 	}
-	return __spin[_pin.get_board() - 1];
+	return __spin[_pin - 1];
 }
 
 int setup(){
 	int result = wiringPiSetupSys();
 	for (pos_t i = 0; result != -1, i != 40; ++i) {
-		__spin[i].__init_data(i + 1);
+		__spin[i].data_.reset(new basic_pin(i + 1));
+		//__spin[i].__init_data(i + 1);
 	}
 	return result;
 }
@@ -65,6 +61,7 @@ void delayMicroseconds(unsigned int mms){
 }
 
 basic_pin::~basic_pin(){
+	_DO("pin:%d, statue:%d ,release", pin_, statue());
 	reset();
 }
 void basic_pin::reset() {
@@ -80,13 +77,14 @@ void basic_pin::reset() {
 		case SOFT_TONE_OUTPUT: {
 			digitalWrite(get_bcm(), LOW);
 			__setPinMode(get_bcm(), INPUT); //默认在INPUT状态
+			_DO("pin:%d,reset normally", pin_);
 			break;
 		}
 		case SOFT_PWM_OUTPUT: {
 			softPwmStop(get_bcm());
 			digitalWrite(get_bcm(), LOW);
 			__setPinMode(get_bcm(), INPUT); //默认在INPUT状态
-			std::cout << "reset Pwm pin:" << pin_ << std::endl;
+			_DO("pin:%d,reset pwm", pin_)
 			break;
 		}
 		default:
@@ -114,6 +112,7 @@ void pin::statue(pin_mode _t){
 		break;
 	}
 	(data_->mark_ &= 0xFFFFFFF8) |= _t;
+	_DO("pin:%d,mark:%d", borad(), (data_->mark_))
 }
 void pin::write(pin_statue _t){
 	digitalWrite(bcm(), _t);

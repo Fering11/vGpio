@@ -9,8 +9,12 @@ Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|ARM = Debug|ARM
 		Debug|ARM64 = Debug|ARM64
+		Debug|x64 = Debug|x64
+		Debug|x86 = Debug|x86
 		Release|ARM = Release|ARM
 		Release|ARM64 = Release|ARM64
+		Release|x64 = Release|x64
+		Release|x86 = Release|x86
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
 		{8049C179-5085-4331-B2AA-EA128B70BA70}.Debug|ARM.ActiveCfg = Debug|ARM
@@ -19,12 +23,24 @@ Global
 		{8049C179-5085-4331-B2AA-EA128B70BA70}.Debug|ARM64.ActiveCfg = Debug|ARM64
 		{8049C179-5085-4331-B2AA-EA128B70BA70}.Debug|ARM64.Build.0 = Debug|ARM64
 		{8049C179-5085-4331-B2AA-EA128B70BA70}.Debug|ARM64.Deploy.0 = Debug|ARM64
+		{8049C179-5085-4331-B2AA-EA128B70BA70}.Debug|x64.ActiveCfg = Debug|ARM
+		{8049C179-5085-4331-B2AA-EA128B70BA70}.Debug|x64.Build.0 = Debug|ARM
+		{8049C179-5085-4331-B2AA-EA128B70BA70}.Debug|x64.Deploy.0 = Debug|ARM
+		{8049C179-5085-4331-B2AA-EA128B70BA70}.Debug|x86.ActiveCfg = Debug|ARM
+		{8049C179-5085-4331-B2AA-EA128B70BA70}.Debug|x86.Build.0 = Debug|ARM
+		{8049C179-5085-4331-B2AA-EA128B70BA70}.Debug|x86.Deploy.0 = Debug|ARM
 		{8049C179-5085-4331-B2AA-EA128B70BA70}.Release|ARM.ActiveCfg = Release|ARM
 		{8049C179-5085-4331-B2AA-EA128B70BA70}.Release|ARM.Build.0 = Release|ARM
 		{8049C179-5085-4331-B2AA-EA128B70BA70}.Release|ARM.Deploy.0 = Release|ARM
 		{8049C179-5085-4331-B2AA-EA128B70BA70}.Release|ARM64.ActiveCfg = Release|ARM64
 		{8049C179-5085-4331-B2AA-EA128B70BA70}.Release|ARM64.Build.0 = Release|ARM64
 		{8049C179-5085-4331-B2AA-EA128B70BA70}.Release|ARM64.Deploy.0 = Release|ARM64
+		{8049C179-5085-4331-B2AA-EA128B70BA70}.Release|x64.ActiveCfg = Release|ARM
+		{8049C179-5085-4331-B2AA-EA128B70BA70}.Release|x64.Build.0 = Release|ARM
+		{8049C179-5085-4331-B2AA-EA128B70BA70}.Release|x64.Deploy.0 = Release|ARM
+		{8049C179-5085-4331-B2AA-EA128B70BA70}.Release|x86.ActiveCfg = Release|ARM
+		{8049C179-5085-4331-B2AA-EA128B70BA70}.Release|x86.Build.0 = Release|ARM
+		{8049C179-5085-4331-B2AA-EA128B70BA70}.Release|x86.Deploy.0 = Release|ARM
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
